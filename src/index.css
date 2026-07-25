@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-ink text-parchment font-body antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 20% -10%, rgba(124,143,224,0.10), transparent),
+      radial-gradient(ellipse 60% 50% at 100% 0%, rgba(232,176,75,0.08), transparent);
+    background-attachment: fixed;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+  ::selection {
+    @apply bg-candle/30 text-parchment;
+  }
+  :focus-visible {
+    outline: 2px solid #E8B04B;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-candle text-ink font-body font-semibold px-5 py-2.5 transition-all hover:bg-candle-glow hover:shadow-glow active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink-line text-parchment-muted font-body px-5 py-2.5 transition-colors hover:border-candle/60 hover:text-parchment;
+  }
+  .card {
+    @apply bg-ink-soft border border-ink-line rounded-2xl shadow-note;
+  }
+  .input {
+    @apply w-full bg-ink-softer border border-ink-line rounded-xl px-4 py-3 text-parchment placeholder:text-parchment-dim focus:border-candle/60 outline-none transition-colors font-body;
+  }
+}
+
+/* Wick flame signature element */
+.wick {
+  position: relative;
+  display: inline-block;
+}
+.wick::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(232,176,75,0.55), transparent 70%);
+  filter: blur(3px);
+  z-index: -1;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.5s ease-in;
+}
