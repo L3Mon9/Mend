@@ -32,19 +32,26 @@ export default function Feed() {
 
     const postIds = postsData.map((p) => p.id)
     let candleRows = []
+    let commentRows = []
     if (postIds.length > 0) {
-      const { data } = await supabase.from('candles').select('post_id, user_id').in('post_id', postIds)
-      candleRows = data || []
+      const [{ data: candleData }, { data: commentData }] = await Promise.all([
+        supabase.from('candles').select('post_id, user_id').in('post_id', postIds),
+        supabase.from('comments').select('post_id').in('post_id', postIds)
+      ])
+      candleRows = candleData || []
+      commentRows = commentData || []
     }
 
     const enriched = postsData.map((p) => {
       const lit = candleRows.filter((c) => c.post_id === p.id)
+      const comments = commentRows.filter((c) => c.post_id === p.id)
       return {
         ...p,
         author_username: p.profiles?.username,
         author_avatar_url: p.profiles?.avatar_url,
         candle_count: lit.length,
-        lit_by_me: lit.some((c) => c.user_id === user?.id)
+        lit_by_me: lit.some((c) => c.user_id === user?.id),
+        comment_count: comments.length
       }
     })
 

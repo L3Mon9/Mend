@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import CommentSection from './CommentSection.jsx'
 
 function timeAgo(dateString) {
   const seconds = Math.floor((Date.now() - new Date(dateString)) / 1000)
@@ -27,6 +28,7 @@ export default function PostCard({ post, onChanged }) {
   const [candleCount, setCandleCount] = useState(post.candle_count ?? 0)
   const [lit, setLit] = useState(post.lit_by_me ?? false)
   const [busy, setBusy] = useState(false)
+  const [showComments, setShowComments] = useState(false)
 
   useEffect(() => {
     setCandleCount(post.candle_count ?? 0)
@@ -37,6 +39,7 @@ export default function PostCard({ post, onChanged }) {
   const isOwn = post.user_id === user?.id
   const canMessage = !post.is_anonymous && !isOwn
   const canLinkProfile = !post.is_anonymous
+  const commentCount = post.comment_count ?? 0
 
   async function toggleCandle() {
     if (busy) return
@@ -135,6 +138,17 @@ export default function PostCard({ post, onChanged }) {
           {candleCount > 0 ? candleCount : t('post.light')}
         </button>
 
+        <button
+          onClick={() => setShowComments((v) => !v)}
+          className={`inline-flex items-center gap-2 text-sm rounded-full px-3 py-1.5 transition-all border ${
+            showComments
+              ? 'bg-dusk/15 text-dusk-soft border-dusk/40'
+              : 'text-parchment-muted border-ink-line hover:border-dusk/40 hover:text-dusk-soft'
+          }`}
+        >
+          💬 {commentCount > 0 ? commentCount : t('post.comments')}
+        </button>
+
         {canMessage && (
           <button
             onClick={startConversation}
@@ -144,6 +158,8 @@ export default function PostCard({ post, onChanged }) {
           </button>
         )}
       </div>
+
+      {showComments && <CommentSection postId={post.id} />}
     </article>
   )
 }

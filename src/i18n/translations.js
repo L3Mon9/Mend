@@ -191,7 +191,16 @@ export const translations = {
     'profile.breakupReason': 'Dahilan ng pagkakahiwalay',
     'profile.healingStage': 'Antas ng paggaling',
     'profile.viewProfile': 'Tingnan ang profile',
-    'profile.backToProfile': 'Bumalik sa profile mo'
+    'profile.backToProfile': 'Bumalik sa profile mo',
+    'post.comments': 'Comments',      // tl: 'Mga Komento'
+'comments.placeholder': 'Write a comment...',   // tl: 'Magsulat ng komento...'
+'comments.send': 'Post',          // tl: 'I-post'
+'comments.reply': 'Reply',        // tl: 'Sagutin'
+'comments.replyPlaceholder': 'Write a reply...', // tl: 'Magsulat ng sagot...'
+'comments.loading': 'Loading comments...',  // tl: 'Naglo-load ang mga komento...'
+'comments.empty': 'No comments yet.',  // tl: 'Wala pang komento.'
+'comments.deleteConfirm': 'Delete this comment? This cannot be undone.', // tl: 'Burahin ang komentong ito?'
+'messages.seen': 'Seen',          // tl: 'Nabasa na'
   }
 }
 
