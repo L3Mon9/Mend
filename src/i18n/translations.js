@@ -192,15 +192,75 @@ export const translations = {
     'profile.healingStage': 'Antas ng paggaling',
     'profile.viewProfile': 'Tingnan ang profile',
     'profile.backToProfile': 'Bumalik sa profile mo',
-    'post.comments': 'Comments',      // tl: 'Mga Komento'
+    'comments': 'Comments',      // tl: 'Mga Komento'
 'comments.placeholder': 'Write a comment...',   // tl: 'Magsulat ng komento...'
-'comments.send': 'Post',          // tl: 'I-post'
+'comments': 'Post',          // tl: 'I-post'
 'comments.reply': 'Reply',        // tl: 'Sagutin'
 'comments.replyPlaceholder': 'Write a reply...', // tl: 'Magsulat ng sagot...'
 'comments.loading': 'Loading comments...',  // tl: 'Naglo-load ang mga komento...'
-'comments.empty': 'No comments yet.',  // tl: 'Wala pang komento.'
+'comments': 'No comments yet.',  // tl: 'Wala pang komento.'
 'comments.deleteConfirm': 'Delete this comment? This cannot be undone.', // tl: 'Burahin ang komentong ito?'
-'messages.seen': 'Seen',          // tl: 'Nabasa na'
+'messages.seen': 'Seen',   
+// EN
+'nav.discover': 'Discover',
+'nav.settings': 'Settings',
+'nav.language': 'Language',
+'settings.genderPrefLabel': 'Gender you want to meet',
+'settings.gender.male': 'Male',
+'settings.gender.female': 'Female',
+'settings.gender.all': 'Everyone',
+'settings.change': 'Change',
+'comments.label': 'Comments',
+'comments.submit': 'Post',
+'discover': 'Discover',
+'subtitle': 'Share a photo or video, and see what others have shared.',
+'discover.selectMedia': 'Tap to add a photo or video',
+'discover.captionPlaceholder': 'Write a caption...',
+'discover.post': 'Post',
+'discover.posting': 'Posting...',
+'discover.invalidFile': 'Please choose an image or video file.',
+'discover.deleteConfirm': 'Delete this post? This cannot be undone.',
+'discover.empty': 'No posts yet. Be the first to share something.',
+
+// EN — idagdag sa 'en' object ng translations.js mo
+'nav.discover': 'Discover',
+'nav.settings': 'Settings',
+'nav.language': 'Language',
+'settings.genderPrefLabel': 'Interested in',
+'settings.gender.male': 'Men',
+'settings.gender.female': 'Women',
+'settings.gender.all': 'Everyone',
+'settings.change': 'Change',
+'comments.label': 'Comments',
+'comments.submit': 'Post',
+'discover': 'Discover',
+' subtitle': 'Share a photo or video.',
+'discover.selectMedia': 'Add media',
+'discover.captionPlaceholder': 'Write a caption...',
+'discover.post': 'Post',
+'discover.posting': 'Posting...',
+'discover.invalidFile': 'Choose an image or video.',
+'discover.deleteConfirm': 'Delete this post?',
+'discover.empty': 'No posts yet.',
+'Discover': 'Discover',
+'nav.settings': 'Settings',
+'nav.language': 'Wika',
+'settings.genderPrefLabel': 'Gender na gusto mong makilala',
+'settings.gender.male': 'Lalaki',
+'settings.gender.female': 'Babae',
+'settings.gender.all': 'Lahat',
+'settings.change': 'Palitan',
+'comments.label': 'Mga Komento',
+'comments.submit': 'I-post',
+'discover': 'Discover',
+'subtitle': 'Mag-share ng litrato o video, at tingnan ang na-share ng iba.',
+'discover.selectMedia': 'I-tap para magdagdag ng litrato o video',
+'discover.captionPlaceholder': 'Sumulat ng caption...',
+'discover.post': 'I-post',
+'discover.posting': 'Pino-post...',
+'discover.invalidFile': 'Pumili ng litrato o video file.',
+'discover.deleteConfirm': 'Burahin ang post na ito? Hindi na ito mababawi.',
+'discover.empty': 'Wala pang post dito. Ikaw ang maging una.'       // tl: 'Nabasa na'
   }
 }
 

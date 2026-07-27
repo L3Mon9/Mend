@@ -158,7 +158,25 @@ export default function Conversation() {
     })
     if (error) console.error(error)
   }
+// add near other useState
+const [bursts, setBursts] = useState([]) // [{id, emoji, mine}]
+const [justReacted, setJustReacted] = useState(null) // `${messageId}:${emoji}`
 
+async function toggleReaction(messageId, emoji, mine) {
+  setPickerFor(null)
+  const existing = (reactions[messageId] || []).find((r) => r.emoji === emoji && r.user_id === user.id)
+
+  if (!existing) {
+    // trigger the floating burst + pop only when adding a reaction
+    const burstId = Date.now()
+    setBursts((prev) => [...prev, { id: burstId, emoji, mine }])
+    setTimeout(() => setBursts((prev) => prev.filter((b) => b.id !== burstId)), 900)
+    setJustReacted(`${messageId}:${emoji}`)
+    setTimeout(() => setJustReacted(null), 350)
+  }
+
+  // ...keep the rest of your existing toggleReaction logic here
+}
   async function toggleReaction(messageId, emoji) {
     setPickerFor(null)
     const mine = (reactions[messageId] || []).find((r) => r.emoji === emoji && r.user_id === user.id)
@@ -187,6 +205,18 @@ export default function Conversation() {
 
   // Last message I sent — used to show a single "Seen" indicator, like a
   // normal chat app, instead of repeating it under every bubble.
+  <div className="relative group max-w-[75%]">
+  {bursts.filter(() => pickerFor === null).map((b) => (
+    <span
+      key={b.id}
+      className="absolute -top-2 text-xl animate-float-up"
+      style={{ [mine ? 'right' : 'left']: '8px' }}
+    >
+      {b.emoji}
+    </span>
+  ))}
+  {/* existing bubble div dito */}
+</div>
   const lastMineId = [...messages].reverse().find((m) => m.sender_id === user.id)?.id
 
   return (
@@ -248,22 +278,21 @@ export default function Conversation() {
               {grouped.length > 0 && (
                 <div className={`flex gap-1 mt-1 flex-wrap ${mine ? 'justify-end' : 'justify-start'}`}>
                   {grouped.map(({ emoji, rows }) => {
-                    const reactedByMe = rows.some((r) => r.user_id === user.id)
-                    return (
-                      <button
-                        key={emoji}
-                        onClick={() => toggleReaction(m.id, emoji)}
-                        className={`text-xs rounded-full px-2 py-0.5 border flex items-center gap-1 ${
-                          reactedByMe
-                            ? 'bg-candle/15 border-candle/40 text-candle'
-                            : 'bg-ink-softer border-ink-line text-parchment-muted'
-                        }`}
-                      >
-                        <span>{emoji}</span>
-                        {rows.length > 1 && <span>{rows.length}</span>}
-                      </button>
-                    )
-                  })}
+  const reactedByMe = rows.some((r) => r.user_id === user.id)
+  const pulseKey = justReacted === `${m.id}:${emoji}` ? `${emoji}-pulse` : emoji
+  return (
+    <button
+      key={pulseKey}
+      onClick={() => toggleReaction(m.id, emoji, mine)}
+      className={`text-xs rounded-full px-2 py-0.5 border flex items-center gap-1 ${
+        justReacted === `${m.id}:${emoji}` ? 'animate-pop' : ''
+      } ${reactedByMe ? 'bg-candle/15 border-candle/40 text-candle' : 'bg-ink-softer border-ink-line text-parchment-muted'}`}
+    >
+      <span>{emoji}</span>
+      {rows.length > 1 && <span>{rows.length}</span>}
+    </button>
+  )
+})}
                 </div>
               )}
 

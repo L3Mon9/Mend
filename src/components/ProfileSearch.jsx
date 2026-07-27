@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { getBlockedIds } from '../lib/blocks'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
 
@@ -13,6 +14,11 @@ export default function ProfileSearch() {
   const [open, setOpen] = useState(false)
   const boxRef = useRef(null)
   const debounceRef = useRef(null)
+  const blockedIdsRef = useRef([])
+
+  useEffect(() => {
+    if (user) getBlockedIds(user.id).then((ids) => (blockedIdsRef.current = ids))
+  }, [user])
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -41,7 +47,10 @@ export default function ProfileSearch() {
         .neq('id', user?.id ?? '')
         .limit(8)
 
-      if (!error) setResults(data || [])
+      if (!error) {
+        const blocked = blockedIdsRef.current
+        setResults((data || []).filter((p) => !blocked.includes(p.id)))
+      }
       setLoading(false)
     }, 300)
 

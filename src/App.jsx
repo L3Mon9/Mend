@@ -3,12 +3,16 @@ import Navbar from './components/Navbar.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Login from './pages/Login.jsx'
 import Feed from './pages/Feed.jsx'
+import Discover from './pages/Discover.jsx'
 import NewPost from './pages/NewPost.jsx'
 import Messages from './pages/Messages.jsx'
 import Conversation from './pages/Conversation.jsx'
 import Profile from './pages/Profile.jsx'
 import Onboarding from './pages/Onboarding.jsx'
 import ViewProfile from './pages/ViewProfile.jsx'
+
+
+
 
 export default function App() {
   return (
@@ -24,11 +28,21 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/discover" element=
+        {<ProtectedRoute><Discover /></ProtectedRoute>} />
         <Route
           path="/"
           element={
             <ProtectedRoute>
               <Feed />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/discover"
+          element={
+            <ProtectedRoute>
+              <Discover />
             </ProtectedRoute>
           }
         />

@@ -1,10 +1,66 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import PostCard from '../components/PostCard.jsx'
 import ProfileSearch from '../components/ProfileSearch.jsx'
+
+function Composer({ onPosted }) {
+  const { user } = useAuth()
+  const { t } = useLanguage()
+  const [content, setContent] = useState('')
+  const [isAnonymous, setIsAnonymous] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (!content.trim()) return
+    setBusy(true)
+    setError('')
+    const { error } = await supabase.from('posts').insert({
+      user_id: user.id,
+      content: content.trim(),
+      is_anonymous: isAnonymous
+    })
+    setBusy(false)
+    if (error) {
+      setError(error.message)
+      return
+    }
+    setContent('')
+    setIsAnonymous(false)
+    onPosted()
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="card p-5 mb-6 space-y-3">
+      <textarea
+        className="input min-h-[90px] resize-y font-body leading-relaxed"
+        placeholder={t('newpost.placeholder')}
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        maxLength={4000}
+      />
+      <div className="flex items-center justify-between gap-3">
+        <label className="flex items-center gap-2 text-xs text-parchment-dim cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isAnonymous}
+            onChange={(e) => setIsAnonymous(e.target.checked)}
+            className="w-4 h-4 accent-candle"
+          />
+          {t('newpost.anon.label')}
+        </label>
+        <button type="submit" disabled={!content.trim() || busy} className="btn-primary px-5">
+          {busy ? t('newpost.submitting') : t('newpost.submit')}
+        </button>
+      </div>
+      {error && <p className="text-sm text-red-400">{error}</p>}
+    </form>
+  )
+}
 
 export default function Feed() {
   const { user } = useAuth()
@@ -69,6 +125,8 @@ export default function Feed() {
         <p className="text-parchment-dim text-sm mt-1">{t('feed.subtitle')}</p>
       </div>
 
+      <Composer onPosted={loadPosts} />
+
       {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
 
       {posts === null && (
@@ -80,9 +138,6 @@ export default function Feed() {
       {posts && posts.length === 0 && (
         <div className="card p-10 text-center">
           <p className="text-parchment-muted">{t('feed.empty')}</p>
-          <Link to="/new" className="btn-primary inline-flex mt-4">
-            {t('feed.emptyCta')}
-          </Link>
         </div>
       )}
 

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
@@ -22,24 +22,15 @@ function timeAgo(dateString) {
   return 'just now'
 }
 
-export default function PostCard({ post, onChanged }) {
+export default function MediaPostCard({ post, onChanged }) {
   const { user } = useAuth()
   const { t } = useLanguage()
-  const navigate = useNavigate()
   const [candleCount, setCandleCount] = useState(post.candle_count ?? 0)
   const [lit, setLit] = useState(post.lit_by_me ?? false)
   const [busy, setBusy] = useState(false)
   const [showComments, setShowComments] = useState(false)
 
-  useEffect(() => {
-    setCandleCount(post.candle_count ?? 0)
-    setLit(post.lit_by_me ?? false)
-  }, [post.candle_count, post.lit_by_me])
-
-  const displayName = post.is_anonymous ? t('post.anonymous') : post.author_username || 'Someone'
   const isOwn = post.user_id === user?.id
-  const canMessage = !post.is_anonymous && !isOwn
-  const canLinkProfile = !post.is_anonymous
   const commentCount = post.comment_count ?? 0
 
   async function toggleCandle() {
@@ -47,11 +38,11 @@ export default function PostCard({ post, onChanged }) {
     setBusy(true)
     try {
       if (lit) {
-        await supabase.from('candles').delete().eq('post_id', post.id).eq('user_id', user.id)
+        await supabase.from('media_candles').delete().eq('media_post_id', post.id).eq('user_id', user.id)
         setLit(false)
         setCandleCount((c) => Math.max(0, c - 1))
       } else {
-        await supabase.from('candles').insert({ post_id: post.id, user_id: user.id })
+        await supabase.from('media_candles').insert({ media_post_id: post.id, user_id: user.id })
         setLit(true)
         setCandleCount((c) => c + 1)
       }
@@ -63,64 +54,52 @@ export default function PostCard({ post, onChanged }) {
   }
 
   async function handleDelete() {
-    if (!confirm('Delete this post? This cannot be undone.')) return
-    await supabase.from('posts').delete().eq('id', post.id)
+    if (!confirm(t('discover.deleteConfirm'))) return
+    await supabase.from('media_posts').delete().eq('id', post.id)
     onChanged?.()
   }
 
-  function startConversation() {
-    navigate(`/messages/${post.user_id}`)
-  }
-
-  const avatar = (
-    <div
-      className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 overflow-hidden ${
-        post.is_anonymous
-          ? 'bg-ink-softer text-parchment-dim border border-dashed border-ink-line'
-          : 'bg-dusk/20 text-dusk-soft border border-dusk/30'
-      }`}
-    >
-      {!post.is_anonymous && post.author_avatar_url ? (
-        <img src={post.author_avatar_url} alt={displayName} className="w-full h-full object-cover" />
-      ) : post.is_anonymous ? (
-        '?'
-      ) : (
-        displayName.slice(0, 1).toUpperCase()
-      )}
-    </div>
-  )
-
   return (
-    <article className="card p-6 animate-rise">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          {canLinkProfile ? <Link to={`/u/${post.user_id}`}>{avatar}</Link> : avatar}
-          <div>
-            {canLinkProfile ? (
-              <Link
-                to={`/u/${post.user_id}`}
-                className="text-sm font-medium text-parchment hover:text-candle transition-colors"
-              >
-                {displayName}
-              </Link>
+    <article className="card overflow-hidden animate-rise">
+      <div className="flex items-center justify-between gap-4 p-4 pb-0">
+        <Link to={`/u/${post.user_id}`} className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-dusk/20 border border-dusk/30 flex items-center justify-center text-sm font-semibold text-dusk-soft shrink-0 overflow-hidden">
+            {post.author_avatar_url ? (
+              <img src={post.author_avatar_url} alt="" className="w-full h-full object-cover" />
             ) : (
-              <p className="text-sm font-medium text-parchment">{displayName}</p>
+              (post.author_username || '?').slice(0, 1).toUpperCase()
             )}
+          </div>
+          <div>
+            <p className="text-sm font-medium text-parchment hover:text-candle transition-colors">
+              {post.author_username || 'Someone'}
+            </p>
             <p className="text-xs text-parchment-dim font-mono">{timeAgo(post.created_at)}</p>
           </div>
-        </div>
+        </Link>
+
         {isOwn ? (
           <button onClick={handleDelete} className="text-xs text-parchment-dim hover:text-red-400 transition-colors">
             {t('post.delete')}
           </button>
         ) : (
-          <OptionsMenu targetType="post" targetId={post.id} reportedUserId={post.user_id} onBlocked={onChanged} />
+          <OptionsMenu targetType="media_post" targetId={post.id} reportedUserId={post.user_id} onBlocked={onChanged} />
         )}
       </div>
 
-      <p className="mt-4 text-parchment leading-relaxed whitespace-pre-wrap font-body">{post.content}</p>
+      <div className="mt-3 bg-ink-softer">
+        {post.media_type === 'image' ? (
+          <img src={post.media_url} alt="" className="w-full max-h-[520px] object-contain" />
+        ) : (
+          <video src={post.media_url} controls className="w-full max-h-[520px]" />
+        )}
+      </div>
 
-      <div className="mt-5 flex items-center gap-3 border-t border-ink-line pt-4">
+      {post.caption && (
+        <p className="px-4 pt-3 text-parchment leading-relaxed whitespace-pre-wrap">{post.caption}</p>
+      )}
+
+      <div className="flex items-center gap-3 px-4 py-4">
         <button
           onClick={toggleCandle}
           disabled={busy}
@@ -145,15 +124,13 @@ export default function PostCard({ post, onChanged }) {
         >
           💬 {commentCount > 0 ? commentCount : t('comments.label')}
         </button>
-
-        {canMessage && (
-          <button onClick={startConversation} className="text-sm text-parchment-muted hover:text-dusk-soft transition-colors ml-auto">
-            {t('post.message')}
-          </button>
-        )}
       </div>
 
-      {showComments && <CommentSection postId={post.id} type="post" />}
+      {showComments && (
+        <div className="px-4 pb-4">
+          <CommentSection postId={post.id} type="media_post" />
+        </div>
+      )}
     </article>
   )
 }

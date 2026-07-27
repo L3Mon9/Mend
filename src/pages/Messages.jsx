@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { getBlockedIds } from '../lib/blocks'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
 
@@ -26,9 +27,12 @@ export default function Messages() {
       return
     }
 
+    const blockedIds = await getBlockedIds(user.id)
+
     const byPartner = new Map()
     for (const m of data) {
       const partnerId = m.sender_id === user.id ? m.receiver_id : m.sender_id
+      if (blockedIds.includes(partnerId)) continue
       if (!byPartner.has(partnerId)) {
         byPartner.set(partnerId, {
           partnerId,

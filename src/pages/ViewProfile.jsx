@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { getBlockedIds } from '../lib/blocks'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import OptionsMenu from '../components/OptionsMenu.jsx'
 
 export default function ViewProfile() {
   const { userId } = useParams()
@@ -11,6 +13,7 @@ export default function ViewProfile() {
   const navigate = useNavigate()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [blocked, setBlocked] = useState(false)
 
   useEffect(() => {
     load()
@@ -18,6 +21,14 @@ export default function ViewProfile() {
 
   async function load() {
     setLoading(true)
+    const blockedIds = await getBlockedIds(user.id)
+    if (blockedIds.includes(userId)) {
+      setBlocked(true)
+      setProfile(null)
+      setLoading(false)
+      return
+    }
+    setBlocked(false)
     const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
     setProfile(data)
     setLoading(false)
@@ -36,6 +47,17 @@ export default function ViewProfile() {
     )
   }
 
+  if (blocked) {
+    return (
+      <div className="max-w-2xl mx-auto px-5 py-10 text-center text-parchment-dim">
+        <p>{t('profile.blockedNotice')}</p>
+        <Link to="/" className="btn-ghost inline-flex mt-4">
+          {t('nav.feed')}
+        </Link>
+      </div>
+    )
+  }
+
   if (!profile) {
     return (
       <div className="max-w-2xl mx-auto px-5 py-10 text-center text-parchment-dim">
@@ -49,7 +71,16 @@ export default function ViewProfile() {
 
   return (
     <div className="max-w-2xl mx-auto px-5 py-10">
-      <div className="card p-8 text-center">
+      <div className="card p-8 text-center relative">
+        <div className="absolute top-4 right-4">
+          <OptionsMenu
+            targetType="profile"
+            targetId={null}
+            reportedUserId={profile.id}
+            onBlocked={() => navigate('/')}
+          />
+        </div>
+
         <div className="w-24 h-24 rounded-full mx-auto overflow-hidden border-2 border-candle/40 bg-ink-softer flex items-center justify-center">
           {profile.avatar_url ? (
             <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
